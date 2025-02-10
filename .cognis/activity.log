@@ -11,3 +11,4 @@
 2024-12-14T09:01:11  fix: the cake is a lie, but the bug was real
 2024-12-27T16:18:18  refactor(docs): support stdin as a source
 2025-01-09T11:35:25  refactor(docs): support stdin as a source
+2025-02-10T18:52:32  style(core): add pagination to large reports
