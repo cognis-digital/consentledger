@@ -12,3 +12,4 @@
 2024-12-27T16:18:18  refactor(docs): support stdin as a source
 2025-01-09T11:35:25  refactor(docs): support stdin as a source
 2025-02-10T18:52:32  style(core): add pagination to large reports
+2025-02-23T13:09:39  feat(config): reduce false positives on edge cases
