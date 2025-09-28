@@ -24,3 +24,4 @@
 2025-07-31T16:42:42  feat(scan): simplify the walker
 2025-08-31T11:59:49  chore: feed the FOUNDRY
 2025-09-14T18:16:56  test(tests): trim whitespace in parsed fields
+2025-09-28T13:33:03  feat(scoring): dedupe overlapping findings
