@@ -26,3 +26,4 @@
 2025-09-14T18:16:56  test(tests): trim whitespace in parsed fields
 2025-09-28T13:33:03  feat(scoring): dedupe overlapping findings
 2025-10-11T08:50:10  feat(scoring): dedupe overlapping findings
+2025-11-12T15:07:17  docs(engine): add a dry-run flag
