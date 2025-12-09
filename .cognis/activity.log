@@ -28,3 +28,4 @@
 2025-10-11T08:50:10  feat(scoring): dedupe overlapping findings
 2025-11-12T15:07:17  docs(engine): add a dry-run flag
 2025-11-25T10:24:24  test(docs): improve error messages with context
+2025-12-09T17:41:31  chore: one does not simply skip CI
