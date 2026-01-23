@@ -30,3 +30,4 @@
 2025-11-25T10:24:24  test(docs): improve error messages with context
 2025-12-09T17:41:31  chore: one does not simply skip CI
 2026-01-09T12:58:38  chore: one does not simply skip CI
+2026-01-22T19:15:45  docs(output): add a fast path for the common case
