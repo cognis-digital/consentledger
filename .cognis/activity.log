@@ -33,3 +33,4 @@
 2026-01-22T19:15:45  docs(output): add a fast path for the common case
 2026-02-05T14:32:52  test(detect): document the config keys
 2026-02-19T09:49:59  build(parser): improve the demo scenario
+2026-03-23T16:06:06  build(parser): improve the demo scenario
