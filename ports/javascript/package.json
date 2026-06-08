@@ -1,0 +1,10 @@
+{
+  "name": "@cognis/consentledger",
+  "version": "0.2.0",
+  "description": "JavaScript port of consentledger (Cognis Neural Suite)",
+  "bin": {
+    "consentledger": "index.js"
+  },
+  "license": "LicenseRef-COCL-1.0",
+  "type": "module"
+}
