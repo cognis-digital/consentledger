@@ -16,7 +16,7 @@
 </div>
 
 ```bash
-pip install cognis-consentledger
+pip install "git+https://github.com/cognis-digital/consentledger.git"
 consentledger scan .            # → prioritized findings in seconds
 ```
 
@@ -53,7 +53,7 @@ Turns the HIPAA 'audit controls' requirement into a verifiable append-only ledge
 ## Quick start
 
 ```bash
-pip install cognis-consentledger
+pip install "git+https://github.com/cognis-digital/consentledger.git"
 consentledger --version
 consentledger scan .                       # scan current project
 consentledger scan . --format json         # machine-readable
