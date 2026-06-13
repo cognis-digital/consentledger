@@ -20,6 +20,43 @@ pip install cognis-consentledger
 consentledger scan .            # → prioritized findings in seconds
 ```
 
+## Usage — step by step
+
+1. **Install:**
+
+   ```bash
+   pip install -e .
+   ```
+
+2. **Append a tamper-evident event** to a hash-chained JSONL ledger with the `append` subcommand. All fields are required; `--meta KEY=VALUE` is repeatable and is folded into the entry hash:
+
+   ```bash
+   consentledger append --ledger audit.jsonl \
+     --actor dr.adams --patient P-1001 --action VIEW --resource chart \
+     --ts 2026-06-08T09:15:00Z
+   ```
+
+3. **List the recorded events** as a table (or `--format json`):
+
+   ```bash
+   consentledger list --ledger audit.jsonl
+   ```
+
+4. **Verify chain integrity** — this is the core check, and it **exits 1 if the ledger was tampered with**. You can also produce an inclusion proof for a single entry with `prove --index`:
+
+   ```bash
+   consentledger verify --ledger audit.jsonl --format json
+   consentledger prove --ledger audit.jsonl --index 0 --format json
+   ```
+
+5. **Use it in CI / compliance jobs** — fail the job if the audit log has been altered:
+
+   ```bash
+   consentledger verify --ledger audit.jsonl --format json || {
+     echo "Consent ledger integrity FAILED"; exit 1; }
+   ```
+
+
 ## Contents
 
 - [Why consentledger?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
