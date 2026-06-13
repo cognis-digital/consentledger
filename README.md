@@ -80,13 +80,8 @@ $ consentledger scan .
 
 ```mermaid
 flowchart LR
-  A[Input: file / dir / API] --> B[Collectors]
-  B --> C[Rules / Analyzers]
-  C --> D[Scorer]
-  D --> E{Reporters}
-  E --> F[Table]
-  E --> G[JSON / SARIF]
-  E --> H[MCP tool -. drives .-> AI agents]
+  IN[addresses + transactions] --> P[consentledger<br/>cluster + trace]
+  P --> OUT[sanctions xref / report]
 ```
 
 <div align="right"><a href="#top">↑ back to top</a></div>
