@@ -20,6 +20,12 @@ pip install "git+https://github.com/cognis-digital/consentledger.git"
 consentledger scan .            # → prioritized findings in seconds
 ```
 
+<!-- cognis:layman:start -->
+## What is this?
+
+﻿ConsentLedger is a record-keeping tool for healthcare organizations that need to track who accessed or changed patient data and why. Every access or consent event gets written to a tamper-evident log — if anyone modifies or deletes a record later, ConsentLedger will detect it automatically. You can run it on your own servers, no third-party accounts needed, making it easy to demonstrate HIPAA audit compliance to regulators or your own security team.
+<!-- cognis:layman:end -->
+
 ## Contents
 
 - [Why consentledger?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
@@ -50,6 +56,42 @@ Turns the HIPAA 'audit controls' requirement into a verifiable append-only ledge
 <div align="right"><a href="#top">↑ back to top</a></div>
 
 <a name="quick-start"></a>
+<!-- cognis:install:start -->
+## Install
+
+`consentledger` is source-available (not published to PyPI) — every method below installs
+straight from GitHub. Pick whichever you prefer; the one-line scripts auto-detect
+the best tool available on your machine.
+
+**One-liner (Linux / macOS):**
+```sh
+curl -fsSL https://raw.githubusercontent.com/cognis-digital/consentledger/HEAD/install.sh | sh
+```
+
+**One-liner (Windows PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/cognis-digital/consentledger/HEAD/install.ps1 | iex
+```
+
+**Or install manually — any one of:**
+```sh
+pipx install "git+https://github.com/cognis-digital/consentledger.git"     # isolated (recommended)
+uv tool install "git+https://github.com/cognis-digital/consentledger.git"  # uv
+pip install "git+https://github.com/cognis-digital/consentledger.git"      # pip
+```
+
+**From source:**
+```sh
+git clone https://github.com/cognis-digital/consentledger.git
+cd consentledger && pip install .
+```
+
+Then run:
+```sh
+consentledger --help
+```
+<!-- cognis:install:end -->
+
 ## Quick start
 
 ```bash
