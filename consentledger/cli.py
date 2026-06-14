@@ -105,7 +105,7 @@ def _cmd_append(args: argparse.Namespace) -> int:
     event.update(_parse_meta(args.meta))
     try:
         entry = append_event(args.ledger, event)
-    except ValueError as exc:
+    except (ValueError, OSError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
     _print(entry.to_dict() if args.format == "json" else {
@@ -119,7 +119,7 @@ def _cmd_append(args: argparse.Namespace) -> int:
 def _cmd_list(args: argparse.Namespace) -> int:
     try:
         entries = load_ledger(args.ledger)
-    except ValueError as exc:
+    except (ValueError, OSError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
     rows = []
@@ -132,7 +132,11 @@ def _cmd_list(args: argparse.Namespace) -> int:
 
 
 def _cmd_verify(args: argparse.Namespace) -> int:
-    result = verify_ledger(args.ledger)
+    try:
+        result = verify_ledger(args.ledger)
+    except Exception as exc:  # noqa: BLE001
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
     _print(result.to_dict(), args.format)
     if not result.ok:
         # Non-zero exit so CI / HIPAA audit gates fail on tampering.
@@ -198,7 +202,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_proof = sub.add_parser("prove", help="prove a single entry is in the chain")
     p_proof.add_argument("--ledger", required=True, help="path to ledger .jsonl file")
-    p_proof.add_argument("--index", type=int, required=True, help="entry index (0-based)")
+    p_proof.add_argument(
+        "--index", type=int, required=True, help="entry index (0-based)"
+    )
     p_proof.set_defaults(func=_cmd_prove)
 
     return parser
@@ -210,7 +216,14 @@ def main(argv: Optional[List[str]] = None) -> int:
     if not getattr(args, "command", None):
         parser.print_help()
         return 0
-    return args.func(args)
+    try:
+        return args.func(args)
+    except KeyboardInterrupt:
+        print("\ninterrupted", file=sys.stderr)
+        return 130
+    except Exception as exc:  # noqa: BLE001
+        print(f"unexpected error: {exc}", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -1,6 +1,8 @@
-"""CONSENTLEDGER MCP server — exposes scan() as an MCP tool for Cognis.Studio."""
+"""CONSENTLEDGER MCP server — exposes verify/append as MCP tools for Cognis.Studio."""
 from __future__ import annotations
-from consentledger.core import scan, to_json
+import json
+from consentledger.core import verify_ledger
+
 
 def serve() -> int:
     """Start an MCP stdio server. Requires the optional 'mcp' extra:
@@ -14,9 +16,13 @@ def serve() -> int:
     app = FastMCP("consentledger")
 
     @app.tool()
-    def consentledger_scan(target: str) -> str:
-        """Maintain a tamper-evident, hash-chained audit log of patient-data access and consent events.. Returns JSON findings."""
-        return to_json(scan(target))
+    def consentledger_verify(ledger_path: str) -> str:
+        """Verify the hash-chain integrity of a consentledger .jsonl file.
+
+        Returns a JSON object with ok, count, head_hash, and errors.
+        """
+        result = verify_ledger(ledger_path)
+        return json.dumps(result.to_dict(), sort_keys=True)
 
     app.run()
     return 0

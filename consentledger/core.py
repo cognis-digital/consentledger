@@ -116,17 +116,21 @@ def validate_event(event: Dict[str, Any]) -> List[str]:
 
 
 def _read_lines(path: str) -> Iterator[Tuple[int, str]]:
-    with open(path, "r", encoding="utf-8") as fh:
-        for lineno, raw in enumerate(fh, start=1):
-            stripped = raw.strip()
-            if stripped:
-                yield lineno, stripped
+    try:
+        with open(path, "r", encoding="utf-8") as fh:
+            for lineno, raw in enumerate(fh, start=1):
+                stripped = raw.strip()
+                if stripped:
+                    yield lineno, stripped
+    except OSError as exc:
+        raise OSError(f"cannot read ledger file {path!r}: {exc}") from exc
 
 
 def load_ledger(path: str) -> List[LedgerEntry]:
     """Load all entries from a ledger file. Returns [] if file is absent.
 
     Raises ValueError on a line that is not valid JSON or not a ledger entry.
+    Raises OSError if the file exists but cannot be read.
     """
     if not os.path.exists(path):
         return []
@@ -136,9 +140,30 @@ def load_ledger(path: str) -> List[LedgerEntry]:
             obj = json.loads(line)
         except json.JSONDecodeError as exc:
             raise ValueError(f"line {lineno}: invalid JSON ({exc})") from exc
+        if not isinstance(obj, dict):
+            raise ValueError(
+                f"line {lineno}: expected a JSON object, got {type(obj).__name__}"
+            )
         for k in ("index", "prev_hash", "event", "entry_hash"):
             if k not in obj:
                 raise ValueError(f"line {lineno}: ledger entry missing '{k}'")
+        if not isinstance(obj["index"], int):
+            got = type(obj["index"]).__name__
+            raise ValueError(
+                f"line {lineno}: 'index' must be an integer, got {got}"
+            )
+        if not isinstance(obj["prev_hash"], str):
+            raise ValueError(
+                f"line {lineno}: 'prev_hash' must be a string"
+            )
+        if not isinstance(obj["entry_hash"], str):
+            raise ValueError(
+                f"line {lineno}: 'entry_hash' must be a string"
+            )
+        if not isinstance(obj["event"], dict):
+            raise ValueError(
+                f"line {lineno}: 'event' must be a JSON object"
+            )
         entries.append(
             LedgerEntry(
                 index=obj["index"],
@@ -156,12 +181,17 @@ def head_hash(path: str) -> str:
     return entries[-1].entry_hash if entries else GENESIS_HASH
 
 
-def append_event(path: str, event: Dict[str, Any], *, strict: bool = True) -> LedgerEntry:
+def append_event(
+    path: str, event: Dict[str, Any], *, strict: bool = True
+) -> LedgerEntry:
     """Validate, chain, and append an event to the ledger file.
 
     With strict=True (default) a malformed event (missing required HIPAA audit
     fields) raises ValueError before anything is written.
+    Raises OSError if the file cannot be opened for writing.
     """
+    if event is None:
+        raise ValueError("event must not be None")
     if strict:
         problems = validate_event(event)
         if problems:
@@ -176,8 +206,11 @@ def append_event(path: str, event: Dict[str, Any], *, strict: bool = True) -> Le
     parent = os.path.dirname(os.path.abspath(path))
     if parent and not os.path.isdir(parent):
         os.makedirs(parent, exist_ok=True)
-    with open(path, "a", encoding="utf-8") as fh:
-        fh.write(entry.to_json() + "\n")
+    try:
+        with open(path, "a", encoding="utf-8") as fh:
+            fh.write(entry.to_json() + "\n")
+    except OSError as exc:
+        raise OSError(f"cannot write to ledger file {path!r}: {exc}") from exc
     return entry
 
 
@@ -193,9 +226,13 @@ def verify_ledger(path: str) -> VerifyResult:
     """
     try:
         entries = load_ledger(path)
-    except ValueError as exc:
-        return VerifyResult(ok=False, count=0, head_hash=GENESIS_HASH,
-                            errors=[{"index": None, "problem": str(exc)}])
+    except (ValueError, OSError) as exc:
+        return VerifyResult(
+            ok=False,
+            count=0,
+            head_hash=GENESIS_HASH,
+            errors=[{"index": None, "problem": str(exc)}],
+        )
 
     errors: List[Dict[str, Any]] = []
     prev_hash = GENESIS_HASH
@@ -204,7 +241,9 @@ def verify_ledger(path: str) -> VerifyResult:
         if entry.index != i:
             errors.append({
                 "index": i,
-                "problem": f"index out of sequence: stored {entry.index!r}, expected {i}",
+                "problem": (
+                    f"index out of sequence: stored {entry.index!r}, expected {i}"
+                ),
             })
         if entry.prev_hash != prev_hash:
             errors.append({
@@ -226,7 +265,9 @@ def verify_ledger(path: str) -> VerifyResult:
         prev_hash = entry.entry_hash
 
     head = entries[-1].entry_hash if entries else GENESIS_HASH
-    return VerifyResult(ok=not errors, count=len(entries), head_hash=head, errors=errors)
+    return VerifyResult(
+        ok=not errors, count=len(entries), head_hash=head, errors=errors
+    )
 
 
 def inclusion_proof(path: str, index: int) -> Dict[str, Any]:
@@ -250,7 +291,9 @@ def inclusion_proof(path: str, index: int) -> Dict[str, Any]:
         "entry": entry.to_dict(),
         "recomputed_hash": recomputed,
         "hash_matches": recomputed == entry.entry_hash,
-        "linked_to_next": (next_prev == entry.entry_hash) if next_prev is not None else None,
+        "linked_to_next": (
+            (next_prev == entry.entry_hash) if next_prev is not None else None
+        ),
         "included": recomputed == entry.entry_hash
         and (next_prev is None or next_prev == entry.entry_hash),
     }
