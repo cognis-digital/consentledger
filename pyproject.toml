@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "cognis-consentledger"
-version = "0.1.0"
+version = "0.1.1"
 description = "Maintain a tamper-evident, hash-chained audit log of patient-data access and consent events."
 authors = [{name = "Cognis Digital", email = "suite@cognis.digital"}]
 license = {text = "LicenseRef-COCL-1.0"}
@@ -20,6 +20,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
+connect = ["cognis-connect @ git+https://github.com/cognis-digital/cognis-connect.git"]
 mcp = ["mcp>=1.0"]
 dev = ["pytest>=8.0"]
 
@@ -28,6 +29,7 @@ Homepage = "https://cognis.digital"
 Repository = "https://github.com/cognis-digital/consentledger"
 
 [project.scripts]
+"consentledger-emit" = "consentledger.connect:emit_main"
 consentledger = "consentledger.cli:main"
 
 [tool.hatch.build.targets.wheel]
