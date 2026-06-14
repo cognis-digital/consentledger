@@ -34,3 +34,6 @@ consentledger = "consentledger.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["consentledger"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
