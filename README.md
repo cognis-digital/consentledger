@@ -20,6 +20,103 @@ pip install cognis-consentledger
 consentledger scan .            # → prioritized findings in seconds
 ```
 
+
+<!-- cognis:example:start -->
+## 🔎 Example output
+
+Real, reproducible output from the tool — runs offline:
+
+```console
+$ consentledger-emit --version
+consentledger 0.1.0
+```
+
+```console
+$ consentledger-emit --help
+usage: consentledger [-h] [--version] [--format {table,json}] command ...
+
+Tamper-evident, hash-chained audit log of patient-data access and consent events (HIPAA audit controls as a verifiable ledger).
+
+positional arguments:
+  command
+    append              record a new access/consent event
+    list                list recorded events
+    verify              verify chain integrity (exit 1 if tampered)
+    prove               prove a single entry is in the chain
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --format {table,json}
+                        output format (default: table; use json for piping/CI)
+
+Command-line interface for CONSENTLEDGER.
+
+Examples
+--------
+  # Record a patient-data access event
+  consentledger append --ledger audit.jsonl \
+      --actor dr.adams --patient P-1001 --action VIEW --resource chart \
+      --ts 2026-06-08T09:15:00Z
+
+  # Record a consent grant with extra metadata
+  consentledger append --ledger audit.jsonl \
+      --actor patient.P-1001 --patient P-1001 \
+      --action GRANT_CONSENT --resource consent:research \
+      --meta scope=genomics --meta expires=2027-01-01
+
+  # Verify the whole chain is tamper-free (exit 1 if not) — use in CI
+  consentledger verify --ledger audit.jsonl --format json
+
+  # List events as a table
+  consentledger list --ledger audit.jsonl
+
+  # Prove a specific entry is included in the chain
+  consentledger prove --ledger audit.jsonl --index 0 --format json
+```
+
+> Blocks above are real `consentledger` output — reproduce them from a clone.
+
+**Sample result format** _(illustrative values — run on your own data for real findings):_
+
+```
+{
+"timestamp": "2023-02-16T14:30:00Z",
+"findings": [
+  {
+    "id": "1234567890",
+    "title": "Suspicious Network Traffic",
+    "description": "Potential malicious activity detected on network interface eth0",
+    "labels": ["network", "suspicious"],
+    "objects": [
+      {
+        "id": "object-1",
+        "type": "indicator",
+        "name": "Malicious IP Address",
+        "value": "192.168.1.100"
+      }
+    ]
+  },
+  {
+    "id": "2345678900",
+    "title": "Unusual File Access",
+    "description": "Unauthorized access to sensitive file /home/user/data.txt",
+    "labels": ["file", "unusual"],
+    "objects": [
+      {
+        "id": "object-2",
+        "type": "indicator",
+        "name": "Malicious User Agent",
+        "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+      }
+    ]
+  }
+]
+}
+```
+
+<!-- cognis:example:end -->
+
 ## Usage — step by step
 
 1. **Install:**
